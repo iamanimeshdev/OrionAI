@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AI Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    .row { display: flex; gap: 8px; margin-bottom: 12px; }
+    input, button { font-size: 16px; padding: 8px 10px; }
+    #output {
+      white-space: pre-wrap; /* keep newlines */
+      border: 1px solid #ddd; border-radius: 8px;
+      padding: 12px; min-height: 160px; max-height: 50vh; overflow: auto;
+    }
+    #status { font-size: 12px; color: #666; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>AI Stream (SSE)</h1>
+
+  <div class="row">
+    <input id="prompt" type="text" size="60"
+           placeholder="Type your prompt..."
+           value="Write a short JSX code for a counter" />
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+  </div>
+
+  <div id="output"></div>
+  <div id="status">Idle</div>
+
+  <script>
+    const promptEl = document.getElementById('prompt');
+    const startBtn = document.getElementById('start');
+    const stopBtn  = document.getElementById('stop');
+    const outputEl = document.getElementById('output');
+    const statusEl = document.getElementById('status');
+
+    let es; // current EventSource
+
+    function startStream() {
+      // Close any existing stream first
+      if (es) {
+        es.close();
+        es = null;
+      }
+
+      const prompt = promptEl.value.trim() || "Write a short JS code to add two numbers";
+      const url = `http://localhost:3001/stream-ai?prompt=${encodeURIComponent(prompt)}`;
+
+      outputEl.textContent = "";
+      statusEl.textContent = "Connecting…";
+
+      es = new EventSource(url, { withCredentials: false });
+
+      es.onmessage = (event) => {
+        // Our server sends plain text chunks JSON-stringified
+        try {
+          const text = JSON.parse(event.data);
+          outputEl.textContent += text;
+          // autoscroll
+          outputEl.scrollTop = outputEl.scrollHeight;
+          statusEl.textContent = "Streaming…";
+        } catch {
+          // If non-JSON slips through, append as-is
+          outputEl.textContent += event.data;
+        }
+      };
+
+      es.addEventListener('end', () => {
+        statusEl.textContent = "Done";
+        es.close();
+        es = null;
+      });
+
+      es.addEventListener('error', (err) => {
+        statusEl.textContent = "Error or connection closed";
+        console.error("SSE error:", err);
+        if (es) { es.close(); es = null; }
+      });
+    }
+
+    function stopStream() {
+      if (es) {
+        es.close();
+        es = null;
+        statusEl.textContent = "Stopped";
+      }
+    }
+
+    startBtn.addEventListener('click', startStream);
+    stopBtn.addEventListener('click', stopStream);
+
+    // Optional: start automatically on load
+    // startStream();
+  </script>
+</body>
+</html>
