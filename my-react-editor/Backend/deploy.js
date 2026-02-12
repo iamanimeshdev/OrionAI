@@ -1,23 +1,18 @@
 // deploy.js
 import fetch from "node-fetch";
-import fs from "fs";
-import path from "path";
 import AdmZip from "adm-zip";
-import { fileURLToPath } from "url";
 import * as babel from "@babel/core";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function deployToNetlify(jsxCode) {
   try {
-    // 1️⃣ Create a temporary folder
-    const buildDir = path.join(__dirname, "temp-site");
-    if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir);
-
-    // 2️⃣ Clean the JSX code
+    // 1️⃣ Clean the JSX code
     let cleanedJSX = jsxCode.trim();
-    
+
     // Remove markdown code blocks if present
     if (cleanedJSX.startsWith('```')) {
       cleanedJSX = cleanedJSX.replace(/```jsx?\n?/g, '').replace(/```\n?$/g, '');
@@ -25,7 +20,7 @@ export async function deployToNetlify(jsxCode) {
 
     console.log("Original JSX (first 200 chars):", cleanedJSX.substring(0, 200));
 
-    // 3️⃣ Transform JSX to plain JavaScript using Babel
+    // 2️⃣ Transform JSX to plain JavaScript using Babel
     let transformedCode;
     try {
       const result = babel.transformSync(cleanedJSX, {
@@ -33,18 +28,15 @@ export async function deployToNetlify(jsxCode) {
         filename: 'app.jsx'
       });
       transformedCode = result.code;
-      
+
       console.log("✅ Babel transformation successful");
-      
+
     } catch (babelError) {
       console.error("❌ Babel transformation error:", babelError);
       throw new Error(`JSX compilation failed: ${babelError.message}`);
     }
 
-    // 4️⃣ Create separate JS file for the app code
-    fs.writeFileSync(path.join(buildDir, "app.js"), transformedCode);
-
-    // 5️⃣ Create index.html that loads the external JS file
+    // 3️⃣ Create index.html content
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -163,17 +155,17 @@ export async function deployToNetlify(jsxCode) {
 </body>
 </html>`;
 
-    fs.writeFileSync(path.join(buildDir, "index.html"), htmlContent);
-
-    // 6️⃣ Zip the folder
+    // 4️⃣ Create Zip in memory (No FS operations)
     const zip = new AdmZip();
-    zip.addLocalFolder(buildDir);
-    const zipPath = path.join(__dirname, "site.zip");
-    zip.writeZip(zipPath);
+    zip.addFile("app.js", Buffer.from(transformedCode, "utf8"));
+    zip.addFile("index.html", Buffer.from(htmlContent, "utf8"));
 
-    console.log("📦 Files in zip:", zip.getEntries().map(e => e.entryName));
+    // Get zip as buffer
+    const zipBuffer = zip.toBuffer();
 
-    // 7️⃣ Create a new site on Netlify
+    console.log("📦 Zip created in memory, size:", zipBuffer.length);
+
+    // 5️⃣ Create a new site on Netlify
     const siteResponse = await fetch("https://api.netlify.com/api/v1/sites", {
       method: "POST",
       headers: {
@@ -193,10 +185,9 @@ export async function deployToNetlify(jsxCode) {
     const siteData = await siteResponse.json();
     console.log("✅ Site created:", siteData.id);
 
-    // 8️⃣ Deploy the zip file
-    const zipBuffer = fs.readFileSync(zipPath);
+    // 6️⃣ Deploy the zip buffer
     const deployUrl = `https://api.netlify.com/api/v1/sites/${siteData.id}/deploys`;
-    
+
     const deployResponse = await fetch(deployUrl, {
       method: "POST",
       headers: {
@@ -214,10 +205,6 @@ export async function deployToNetlify(jsxCode) {
     const deployData = await deployResponse.json();
     console.log("✅ Deploy successful:", deployData.id);
 
-    // 9️⃣ Cleanup temp files
-    fs.rmSync(buildDir, { recursive: true, force: true });
-    fs.unlinkSync(zipPath);
-
     return {
       success: true,
       url: deployData.ssl_url || deployData.url || `https://${siteData.name}.netlify.app`,
@@ -226,17 +213,6 @@ export async function deployToNetlify(jsxCode) {
     };
   } catch (error) {
     console.error("❌ Netlify Deploy Error:", error);
-    
-    // Cleanup on error
-    try {
-      const buildDir = path.join(__dirname, "temp-site");
-      const zipPath = path.join(__dirname, "site.zip");
-      if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true, force: true });
-      if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
-    } catch (cleanupError) {
-      console.error("Cleanup error:", cleanupError);
-    }
-
     return { success: false, error: error.message };
   }
 }

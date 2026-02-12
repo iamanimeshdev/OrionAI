@@ -9,7 +9,7 @@ import { Logo } from "@/components/logo";
 import Spline from "@splinetool/react-spline";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/Firebase";
 
 export default function LoginPage() {
   const router = useRouter();
