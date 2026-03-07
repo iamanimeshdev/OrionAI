@@ -6,7 +6,23 @@ import { deployToNetlify } from "./deploy.js";
 
 
 const app = express();
-app.use(cors());
+
+// Restrict CORS to your frontend domain only
+const allowedOrigins = [
+  process.env.ALLOWED_ORIGIN,
+  'http://localhost:3000',
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (health checks, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
+  credentials: true,
+}));
+
 app.use(express.json({ limit: "5mb" }));
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
