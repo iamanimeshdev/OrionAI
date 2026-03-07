@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
+    "@babel/core": "^7.28.4",
+    "@babel/preset-react": "^7.27.1",
     "@babel/standalone": "^7.28.5",
     "@google/genai": "^1.13.0",
     "@google/generative-ai": "^0.24.1",
