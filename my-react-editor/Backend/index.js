@@ -11,7 +11,45 @@ app.use(express.json({ limit: "5mb" }));
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// --- Rate Limiting (3 generations per IP per day) ---
+const RATE_LIMIT = 3;
+const rateLimit = new Map(); // Map<ip, { count: number, resetTime: number }>
+
+function getRateLimitInfo(ip) {
+  const now = Date.now();
+  let entry = rateLimit.get(ip);
+
+  // Reset if no entry or past reset time
+  if (!entry || now > entry.resetTime) {
+    entry = { count: 0, resetTime: now + 24 * 60 * 60 * 1000 }; // 24hr reset
+    rateLimit.set(ip, entry);
+  }
+
+  return entry;
+}
+
+app.get("/rate-limit-status", (req, res) => {
+  const ip = req.headers["x-forwarded-for"] || req.ip || req.socket.remoteAddress;
+  const entry = getRateLimitInfo(ip);
+  res.json({ remaining: Math.max(0, RATE_LIMIT - entry.count), limit: RATE_LIMIT });
+});
+
 app.get("/stream-ai", async (req, res) => {
+  // Check rate limit first
+  const ip = req.headers["x-forwarded-for"] || req.ip || req.socket.remoteAddress;
+  const entry = getRateLimitInfo(ip);
+
+  if (entry.count >= RATE_LIMIT) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.write(`event: error\ndata: ${JSON.stringify("Rate limit exceeded. You have used all 3 free generations for today. Please try again tomorrow.")}\n\n`);
+    res.end();
+    return;
+  }
+
+  // Increment usage count
+  entry.count++;
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");

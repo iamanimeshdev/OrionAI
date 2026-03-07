@@ -26,14 +26,28 @@ function EditorContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
-  // Deployment State
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [deployUrl, setDeployUrl] = useState<string | null>(null);
   const [deployError, setDeployError] = useState<string | null>(null);
   const [isDeploying, setIsDeploying] = useState(false);
 
+  // Rate Limit State
+  const [remainingGenerations, setRemainingGenerations] = useState<number | null>(null);
+  const [rateLimitMax, setRateLimitMax] = useState<number>(3);
+
   const searchParams = useSearchParams();
   const prompt = searchParams.get('prompt');
+
+  // Fetch rate limit on mount
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/rate-limit-status`)
+      .then((res) => res.json())
+      .then((data) => {
+        setRemainingGenerations(data.remaining);
+        setRateLimitMax(data.limit);
+      })
+      .catch(() => setRemainingGenerations(3));
+  }, []);
 
   // --- SANITIZE BACKEND CODE ---
   const sanitizeCode = (raw: string) => {
@@ -74,6 +88,11 @@ function EditorContent() {
     eventSource.addEventListener('end', () => {
       eventSource.close();
       setIsLoading(false);
+      // Refresh rate limit count
+      fetch(`${BACKEND_URL}/rate-limit-status`)
+        .then((res) => res.json())
+        .then((data) => setRemainingGenerations(data.remaining))
+        .catch(() => { });
     });
 
     eventSource.onerror = (err) => {
@@ -151,6 +170,8 @@ function EditorContent() {
           onRun={handleRun}
           onReload={handleReload}
           onDeploy={handleDeploy}
+          remainingGenerations={remainingGenerations}
+          rateLimit={rateLimitMax}
         />
 
         <div className="flex-1 overflow-hidden">

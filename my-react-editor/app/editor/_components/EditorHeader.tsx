@@ -1,5 +1,6 @@
-import { Loader2, Play, RefreshCw } from 'lucide-react';
+import { Loader2, Play, RefreshCw, Zap, ArrowLeft, LogOut } from 'lucide-react';
 import { Logo } from '@/components/logo';
+import Link from 'next/link';
 
 interface EditorHeaderProps {
     isLoading: boolean;
@@ -7,6 +8,8 @@ interface EditorHeaderProps {
     onRun: () => void;
     onReload: () => void;
     onDeploy: () => void;
+    remainingGenerations: number | null;
+    rateLimit: number;
 }
 
 export function EditorHeader({
@@ -15,10 +18,30 @@ export function EditorHeader({
     onRun,
     onReload,
     onDeploy,
+    remainingGenerations,
+    rateLimit,
 }: EditorHeaderProps) {
     return (
         <div className="bg-gray-800/90 backdrop-blur-sm border-b border-gray-700 p-3 flex items-center justify-between shadow-sm">
-            <Logo />
+            <div className="flex items-center gap-3">
+                <Logo />
+                {remainingGenerations !== null && (
+                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${remainingGenerations <= 0
+                        ? "bg-red-500/20 text-red-400"
+                        : remainingGenerations === 1
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : "bg-green-500/20 text-green-400"
+                        }`}>
+                        <Zap size={12} />
+                        {remainingGenerations}/{rateLimit} left
+                    </div>
+                )}
+                <Link href="/prompt">
+                    <button className="flex items-center gap-1 text-gray-400 hover:text-white text-xs transition-colors">
+                        <ArrowLeft size={12} /> New Prompt
+                    </button>
+                </Link>
+            </div>
             <div className="flex items-center space-x-3">
                 {isLoading && (
                     <div className="flex items-center space-x-2 text-blue-400 text-sm">

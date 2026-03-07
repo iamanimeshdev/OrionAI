@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { auth } from "@/lib/Firebase";
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+  const [splineLoaded, setSplineLoaded] = useState(false);
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
@@ -131,7 +133,18 @@ export default function LoginPage() {
 
       {/* Right side - Spline Scene */}
       <div className="w-1/2 hidden md:block bg-black relative">
-        <Spline scene="https://prod.spline.design/hene0jF2rxDh0jnH/scene.splinecode" />
+        {!splineLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-400/40 border-t-purple-400" />
+              <span className="text-gray-500 text-sm">Loading 3D scene...</span>
+            </div>
+          </div>
+        )}
+        <Spline
+          scene="https://prod.spline.design/hene0jF2rxDh0jnH/scene.splinecode"
+          onLoad={() => setSplineLoaded(true)}
+        />
       </div>
     </div>
   );
