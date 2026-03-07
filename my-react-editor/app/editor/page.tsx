@@ -15,6 +15,8 @@ import { DeployModal } from './_components/DeployModal';
 
 import ProtectedRoute from "@/components/ProtectedRoute";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+
 export default function EditorPage() {
   const [code, setCode] = useState('');
 
@@ -50,7 +52,7 @@ export default function EditorPage() {
     setCode('');
     setExecutedCode(''); // Clear preview?
 
-    const url = `http://localhost:3001/stream-ai?prompt=${encodeURIComponent(
+    const url = `${BACKEND_URL}/stream-ai?prompt=${encodeURIComponent(
       prompt
     )}`;
     const eventSource = new EventSource(url);
@@ -118,7 +120,7 @@ export default function EditorPage() {
     setDeployUrl(null);
 
     try {
-      const res = await fetch("http://localhost:3001/deploy", {
+      const res = await fetch(`${BACKEND_URL}/deploy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jsxCode: code }),
