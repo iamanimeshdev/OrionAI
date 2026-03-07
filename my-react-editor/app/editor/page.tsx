@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { EditorHeader } from './_components/EditorHeader';
 import { CodeEditor } from './_components/CodeEditor';
@@ -17,7 +17,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-export default function EditorPage() {
+function EditorContent() {
   const [code, setCode] = useState('');
 
 
@@ -183,5 +183,13 @@ export default function EditorPage() {
         />
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-gray-900 flex items-center justify-center text-white">Loading...</div>}>
+      <EditorContent />
+    </Suspense>
   );
 }
