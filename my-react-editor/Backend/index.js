@@ -9,7 +9,7 @@ const app = express();
 
 // Restrict CORS to your frontend domain only
 const allowedOrigins = [
-  process.env.ALLOWED_ORIGIN,
+  process.env.ALLOWED_ORIGIN?.replace(/\/$/, ''),
   'http://localhost:3000',
 ].filter(Boolean);
 
