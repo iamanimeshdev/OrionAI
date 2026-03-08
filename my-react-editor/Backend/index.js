@@ -97,7 +97,7 @@ When the user requests a site (e.g., “Make me a landing page for a bakery”),
 
   const prompt = template + (req.query.prompt || "Write a short JSX code for a counter");
 
-  const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
   try {
     const stream = await model.generateContentStream(prompt);
