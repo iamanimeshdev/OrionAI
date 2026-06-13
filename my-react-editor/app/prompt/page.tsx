@@ -44,7 +44,7 @@ export default function PromptPage() {
 
   return (
     <ProtectedRoute>
-      <div className="relative min-h-screen text-white flex items-center justify-center px-6 overflow-hidden">
+      <div className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden">
         {/* 🌌 Glowing Ellipses */}
         <div className="absolute inset-0 -z-10 flex items-end justify-center overflow-hidden bg-black">
           {/* Planet Horizon Glow */}
@@ -57,18 +57,18 @@ export default function PromptPage() {
           <div className="absolute bottom-0 w-[150%] h-[40%] rounded-[50%] bg-gradient-to-t from-blue-800/40 via-blue-600/20 to-transparent blur-3xl opacity-60" />
         </div>
         {/* ⚡ Main Content */}
-        <div className="w-full max-w-3xl text-center space-y-10">
-          <h1 className="text-7xl md:text-8xl font-extrabold tracking-wide drop-shadow-lg">
+        <div className="w-full max-w-3xl text-center space-y-6 sm:space-y-8 md:space-y-10 py-8">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-wide drop-shadow-lg">
             Orion<span className="text-purple-400">.AI</span>
           </h1>
-          <p className="text-2xl md:text-3xl text-gray-200 font-light tracking-tight">
-            Describe your vision. We'll <span className="font-semibold text-pink-400">build it</span>.
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200 font-light tracking-tight px-2">
+            Describe your vision. We&apos;ll <span className="font-semibold text-pink-400">build it</span>.
           </p>
 
           {/* Rate Limit Badge */}
           {remaining !== null && (
             <div className="flex justify-center">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border ${isLimitReached
+              <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm border ${isLimitReached
                   ? "bg-red-500/10 border-red-500/30 text-red-400"
                   : "bg-purple-500/10 border-purple-500/30 text-purple-300"
                 }`}>
@@ -80,31 +80,31 @@ export default function PromptPage() {
             </div>
           )}
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="🚀 e.g. Make a beautiful landing page for coffee shop with dark mode"
               disabled={isLimitReached}
-              className="min-h-[160px] text-xl bg-white/10 border border-white/20 text-white placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50"
+              className="min-h-[120px] sm:min-h-[140px] md:min-h-[160px] text-base sm:text-lg md:text-xl bg-white/10 border border-white/20 text-white placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50"
             />
 
             <Button
               onClick={handleSubmit}
               disabled={loading || !input.trim() || isLimitReached}
               size="lg"
-              className="w-full h-16 text-xl font-semibold tracking-wide bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 hover:opacity-90 disabled:opacity-40"
+              className="w-full h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl font-semibold tracking-wide bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 hover:opacity-90 disabled:opacity-40"
             >
               {loading ? (
-                <span className="inline-flex items-center gap-3">
-                  <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                <span className="inline-flex items-center gap-2 sm:gap-3">
+                  <span className="h-5 w-5 sm:h-6 sm:w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                   Generating...
                 </span>
               ) : isLimitReached ? (
-                "Rate Limit Reached — Try Again Tomorrow"
+                <span className="text-sm sm:text-base md:text-xl">Rate Limit Reached — Try Again Tomorrow</span>
               ) : (
-                <span className="inline-flex items-center gap-3">
-                  Generate App <ArrowRight className="w-7 h-7" />
+                <span className="inline-flex items-center gap-2 sm:gap-3">
+                  Generate App <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                 </span>
               )}
             </Button>

@@ -175,24 +175,49 @@ function EditorContent() {
         />
 
         <div className="flex-1 overflow-hidden">
-          <ResizablePanelGroup orientation="horizontal">
-            <ResizablePanel defaultSize={50} minSize={20}>
-              <CodeEditor
-                code={code}
-                onChange={setCode}
-                isLoading={isLoading}
-              />
-            </ResizablePanel>
-            <ResizableHandle withHandle className="bg-gray-700 w-1 hover:bg-blue-500 transition-colors" />
-            <ResizablePanel defaultSize={50} minSize={20}>
-              <PreviewFrame
-                code={executedCode}
-                isLoading={isLoading}
-                isPreviewLoading={isPreviewLoading}
-                setIsPreviewLoading={setIsPreviewLoading}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          {/* Desktop: side-by-side resizable panels */}
+          <div className="hidden md:block h-full">
+            <ResizablePanelGroup orientation="horizontal">
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <CodeEditor
+                  code={code}
+                  onChange={setCode}
+                  isLoading={isLoading}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle className="bg-gray-700 w-1 hover:bg-blue-500 transition-colors" />
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <PreviewFrame
+                  code={executedCode}
+                  isLoading={isLoading}
+                  isPreviewLoading={isPreviewLoading}
+                  setIsPreviewLoading={setIsPreviewLoading}
+                />
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+
+          {/* Mobile: stacked panels */}
+          <div className="md:hidden h-full">
+            <ResizablePanelGroup orientation="vertical">
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <CodeEditor
+                  code={code}
+                  onChange={setCode}
+                  isLoading={isLoading}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle className="bg-gray-700 h-1 hover:bg-blue-500 transition-colors" />
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <PreviewFrame
+                  code={executedCode}
+                  isLoading={isLoading}
+                  isPreviewLoading={isPreviewLoading}
+                  setIsPreviewLoading={setIsPreviewLoading}
+                />
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
         </div>
 
         <DeployModal

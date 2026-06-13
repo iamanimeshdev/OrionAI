@@ -56,18 +56,18 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen w-full">
       {/* Left side - Login Form */}
-      <div className="w-full md:w-1/2 relative bg-black flex items-center justify-center">
+      <div className="w-full md:w-1/2 relative bg-black flex items-center justify-center min-h-screen md:min-h-0">
         {/* Top-left logo */}
-        <header className="absolute top-6 left-6 z-10">
+        <header className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10">
           <div className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-sm w-max">
             <Logo />
           </div>
         </header>
 
         {/* Form card */}
-        <div className="w-full max-w-md px-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl p-8">
-            <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-white text-center">
+        <div className="w-full max-w-md px-4 sm:px-6">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl p-6 sm:p-8">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4 sm:mb-6 text-white text-center">
               Welcome Back
             </h2>
 

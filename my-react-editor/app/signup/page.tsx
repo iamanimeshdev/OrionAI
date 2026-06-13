@@ -58,19 +58,19 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen w-full">
       {/* Left side - Signup Form */}
-      <div className="w-full md:w-1/2 relative bg-black flex items-center justify-center">
-        <header className="absolute top-6 left-6 z-10">
+      <div className="w-full md:w-1/2 relative bg-black flex items-center justify-center min-h-screen md:min-h-0">
+        <header className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10">
           <div className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-sm w-max">
             <Logo />
           </div>
         </header>
 
-        <div className="w-full max-w-md px-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl p-8">
-            <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-white text-center">
+        <div className="w-full max-w-md px-4 sm:px-6">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl p-6 sm:p-8">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4 sm:mb-6 text-white text-center">
               Create Your Account
             </h2>
-            <p className="text-sm text-gray-400 mb-6 text-center">
+            <p className="text-sm text-gray-400 mb-4 sm:mb-6 text-center">
               Create your free account and get started today.
             </p>
 
